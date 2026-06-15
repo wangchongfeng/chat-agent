@@ -1,0 +1,19 @@
+{
+  "name": "chat-agent-web",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.27",
+    "element-plus": "^2.7.5",
+    "@microsoft/fetch-event-source": "^2.0.1",
+    "marked": "^12.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "vite": "^5.3.1"
+  }
+}
