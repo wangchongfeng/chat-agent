@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id VARCHAR(64) NOT NULL,
   title VARCHAR(255) DEFAULT 'New Chat',
-  model_id VARCHAR(64) DEFAULT 'openai-gpt35',
+  model_id VARCHAR(64) DEFAULT 'qwen2.5:7b',
   skill_id VARCHAR(64),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

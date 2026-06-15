@@ -1,11 +1,11 @@
 # Chat Agent
 
-A full-stack chat application with multi-provider LLM support, streaming responses, and skill templates.
+A full-stack chat application with OpenAI-compatible LLM support, streaming responses, and skill templates.
 
 ## Features
 
 - Multi-turn conversations with streaming output
-- Switch between OpenAI and Anthropic models
+- Switch between OpenAI-compatible models (DeepSeek, Moonshot, Ollama, etc.)
 - Pre-built skill templates (Code, Translation, Writing, etc.)
 - Conversation history with anonymous sessions
 - Stop generation mid-response
@@ -14,7 +14,7 @@ A full-stack chat application with multi-provider LLM support, streaming respons
 
 **Frontend:** Vue 3, Vite, Element Plus, fetch-event-source, marked
 **Backend:** Hono, PostgreSQL
-**LLM:** OpenAI, Anthropic (extensible)
+**LLM:** OpenAI-compatible API (OpenAI, DeepSeek, Moonshot, Ollama, vLLM)
 
 ## Quick Start
 
@@ -56,9 +56,18 @@ Open http://localhost:5173
 |----------|-------------|
 | `DATABASE_URL` | PostgreSQL connection string |
 | `PORT` | Server port (default: 3000) |
-| `OPENAI_API_KEY` | OpenAI API key |
-| `OPENAI_BASE_URL` | OpenAI API base URL |
-| `ANTHROPIC_API_KEY` | Anthropic API key |
+| `OPENAI_API_KEY` | API key for LLM service |
+| `OPENAI_BASE_URL` | API base URL (see examples below) |
+
+### Supported LLM Services
+
+| Service | OPENAI_BASE_URL |
+|---------|-----------------|
+| OpenAI | `https://api.openai.com/v1` |
+| DeepSeek | `https://api.deepseek.com/v1` |
+| Moonshot | `https://api.moonshot.cn/v1` |
+| Ollama (local) | `http://localhost:11434/v1` |
+| vLLM (local) | `http://localhost:8000/v1` |
 
 ## Project Structure
 

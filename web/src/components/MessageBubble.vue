@@ -11,15 +11,22 @@
 <script setup>
 import { computed } from 'vue'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const props = defineProps({
   role: { type: String, required: true },
   content: { type: String, default: '' }
 })
 
+marked.setOptions({
+  breaks: true,
+  gfm: true
+})
+
 const renderedContent = computed(() => {
   if (!props.content) return ''
-  return marked.parse(props.content)
+  const rawHtml = marked.parse(props.content)
+  return DOMPurify.sanitize(rawHtml)
 })
 </script>
 
@@ -28,8 +35,8 @@ const renderedContent = computed(() => {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 16px;
+  border-radius: 16px;
 }
 
 .message-user {
@@ -41,50 +48,84 @@ const renderedContent = computed(() => {
   background: var(--color-agent-bubble);
 }
 
-.message-system {
-  background: var(--color-bg-secondary);
-  justify-content: center;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-}
-
 .bubble-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 18px;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .bubble-content {
-  line-height: 1.6;
-  max-width: 80%;
+  line-height: 1.7;
+  max-width: 85%;
+  word-break: break-word;
 }
 
 .bubble-content :deep(pre) {
   background: #1E293B;
   color: #E2E8F0;
-  padding: 12px;
+  padding: 16px;
   border-radius: 8px;
   overflow-x: auto;
-  margin: 8px 0;
+  margin: 12px 0;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .bubble-content :deep(code) {
-  font-family: 'Fira Code', monospace;
-  font-size: 14px;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+}
+
+.bubble-content :deep(p code) {
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--color-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .bubble-content :deep(p) {
   margin: 8px 0;
 }
 
-.bubble-content :deep(ul), .bubble-content :deep(ol) {
-  padding-left: 20px;
+.bubble-content :deep(ul),
+.bubble-content :deep(ol) {
+  padding-left: 24px;
   margin: 8px 0;
+}
+
+.bubble-content :deep(li) {
+  margin: 4px 0;
+}
+
+.bubble-content :deep(blockquote) {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 12px;
+  margin: 8px 0;
+  color: var(--color-text-secondary);
+}
+
+.bubble-content :deep(table) {
+  border-collapse: collapse;
+  margin: 12px 0;
+  width: 100%;
+}
+
+.bubble-content :deep(th),
+.bubble-content :deep(td) {
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.bubble-content :deep(th) {
+  background: var(--color-bg-secondary);
+  font-weight: 600;
 }
 </style>

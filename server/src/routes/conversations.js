@@ -18,7 +18,7 @@ conversations.post('/', async (c) => {
   const { title, model_id, skill_id } = await c.req.json()
   const result = await query(
     'INSERT INTO conversations (session_id, title, model_id, skill_id) VALUES ($1, $2, $3, $4) RETURNING *',
-    [sessionId, title || 'New Chat', model_id || 'openai-gpt35', skill_id]
+    [sessionId, title || 'New Chat', model_id || 'qwen2.5:7b', skill_id]
   )
   return c.json(result.rows[0], 201)
 })

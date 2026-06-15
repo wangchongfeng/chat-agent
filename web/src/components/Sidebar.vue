@@ -2,8 +2,8 @@
 <template>
   <aside class="sidebar">
     <div class="sidebar-header">
-      <h2>Chat Agent</h2>
-      <el-button type="primary" @click="$emit('new')" circle>
+      <h2>💬 Chat Agent</h2>
+      <el-button type="primary" @click="$emit('new')" circle size="small">
         +
       </el-button>
     </div>
@@ -15,21 +15,24 @@
         :class="{ active: conv.id === currentId }"
         @click="$emit('select', conv.id)"
       >
-        <div class="conv-title">{{ conv.title }}</div>
-        <div class="conv-meta">
-          <span class="conv-time">{{ formatTime(conv.updated_at) }}</span>
-          <el-button
-            type="danger"
-            text
-            size="small"
-            @click.stop="$emit('delete', conv.id)"
-          >
-            🗑
-          </el-button>
+        <div class="conv-icon">📝</div>
+        <div class="conv-info">
+          <div class="conv-title">{{ conv.title }}</div>
+          <div class="conv-time">{{ formatTime(conv.updated_at) }}</div>
         </div>
+        <el-button
+          type="danger"
+          text
+          size="small"
+          class="delete-btn"
+          @click.stop="$emit('delete', conv.id)"
+        >
+          🗑
+        </el-button>
       </div>
       <div v-if="conversations.length === 0" class="empty-list">
-        No conversations yet
+        <div class="empty-icon">📭</div>
+        <p>No conversations yet</p>
       </div>
     </div>
   </aside>
@@ -56,7 +59,7 @@ function formatTime(dateStr) {
 
 <style scoped>
 .sidebar {
-  width: var(--sidebar-width);
+  width: 280px;
   background: var(--color-bg-secondary);
   border-right: 1px solid var(--color-border);
   display: flex;
@@ -72,8 +75,9 @@ function formatTime(dateStr) {
 }
 
 .sidebar-header h2 {
-  font-size: 18px;
-  color: var(--color-primary);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
 .conversation-list {
@@ -83,10 +87,14 @@ function formatTime(dateStr) {
 }
 
 .conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  margin-bottom: 4px;
 }
 
 .conversation-item:hover {
@@ -97,25 +105,50 @@ function formatTime(dateStr) {
   background: var(--color-primary-light);
 }
 
+.conv-icon {
+  font-size: 16px;
+}
+
+.conv-info {
+  flex: 1;
+  min-width: 0;
+}
+
 .conv-title {
   font-weight: 500;
-  margin-bottom: 4px;
+  font-size: 14px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.conv-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.conv-time {
   font-size: 12px;
   color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.delete-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.conversation-item:hover .delete-btn {
+  opacity: 1;
 }
 
 .empty-list {
   text-align: center;
-  padding: 40px;
+  padding: 40px 20px;
   color: var(--color-text-secondary);
+}
+
+.empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.empty-list p {
+  font-size: 14px;
 }
 </style>

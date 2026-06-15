@@ -5,10 +5,11 @@ import { MODELS } from '../llm/index.js'
 const models = new Hono()
 
 models.get('/', (c) => {
-  const list = Object.entries(MODELS).map(([id, config]) => ({
+  const list = MODELS.map(({ id, name, provider, baseUrl }) => ({
     id,
-    name: config.name,
-    provider: config.provider
+    name,
+    provider,
+    baseUrl
   }))
   return c.json(list)
 })

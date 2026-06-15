@@ -1,13 +1,17 @@
 // web/src/composables/useChat.js
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
-import { api } from '../api/index.js'
 
-export function useChat() {
+export function useChat(messages) {
   const isStreaming = ref(false)
   let abortController = null
 
   async function sendMessage(content, conversationId, modelId, skillId) {
+    messages.value.push({ role: 'user', content })
+
+    const assistantIndex = messages.value.length
+    messages.value.push({ role: 'assistant', content: '' })
+
     isStreaming.value = true
     abortController = new AbortController()
 
@@ -24,6 +28,7 @@ export function useChat() {
           skill_id: skillId
         }),
         signal: abortController.signal,
+        openWhenHidden: false,
         onopen(response) {
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`)
@@ -37,19 +42,21 @@ export function useChat() {
           try {
             const data = JSON.parse(ev.data)
             if (data.error) {
-              console.error('Stream error:', data.error)
+              const msg = messages.value[assistantIndex]
+              messages.value[assistantIndex] = { ...msg, content: msg.content + `\n\nError: ${data.error}` }
+              isStreaming.value = false
               return
             }
-            window.dispatchEvent(new CustomEvent('chat-stream', {
-              detail: { content: data.content }
-            }))
-          } catch (e) {
-            // Skip malformed messages
-          }
+            if (data.content) {
+              const msg = messages.value[assistantIndex]
+              messages.value[assistantIndex] = { ...msg, content: msg.content + data.content }
+            }
+          } catch (e) {}
         },
         onerror(err) {
           console.error('EventSource error:', err)
           isStreaming.value = false
+          throw err
         },
         onclose() {
           isStreaming.value = false
@@ -57,7 +64,8 @@ export function useChat() {
       })
     } catch (err) {
       if (err.name !== 'AbortError') {
-        console.error('Send error:', err)
+        const msg = messages.value[assistantIndex]
+        messages.value[assistantIndex] = { ...msg, content: msg.content + `\n\nError: ${err.message}` }
       }
       isStreaming.value = false
     }
@@ -68,9 +76,5 @@ export function useChat() {
     isStreaming.value = false
   }
 
-  return {
-    isStreaming,
-    sendMessage,
-    stopGeneration
-  }
+  return { isStreaming, sendMessage, stopGeneration }
 }

@@ -15,7 +15,11 @@ dotenv.config()
 const app = new Hono()
 
 app.use('*', logger())
-app.use('*', cors())
+app.use('*', cors({
+  origin: ['http://localhost:5173', 'http://localhost'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowHeaders: ['Content-Type', 'X-Session-Id']
+}))
 
 app.use('*', async (c, next) => {
   let sessionId = c.req.header('X-Session-Id')

@@ -9,14 +9,10 @@
       @delete="deleteConversation"
     />
     <main class="main-content">
-      <div class="chat-header">
+      <div class="chat-header" v-if="!currentConversationId">
         <ModelPicker
           :model-id="currentModel"
           @change="handleModelChange"
-        />
-        <SkillPicker
-          :skill-id="currentSkill"
-          @change="handleSkillChange"
         />
       </div>
       <ChatPanel
@@ -40,15 +36,13 @@ import Sidebar from './components/Sidebar.vue'
 import ChatPanel from './components/ChatPanel.vue'
 import ChatInput from './components/ChatInput.vue'
 import ModelPicker from './components/ModelPicker.vue'
-import SkillPicker from './components/SkillPicker.vue'
 
 const conversations = ref([])
 const currentConversationId = ref(null)
-const currentModel = ref('openai-gpt35')
-const currentSkill = ref(null)
+const currentModel = ref('qwen2.5:7b')
 const messages = ref([])
 
-const { isStreaming, sendMessage, stopGeneration } = useChat()
+const { isStreaming, sendMessage, stopGeneration } = useChat(messages)
 
 onMounted(async () => {
   conversations.value = await api.getConversations()
@@ -59,8 +53,7 @@ onMounted(async () => {
 
 async function createNewConversation() {
   const conv = await api.createConversation({
-    model_id: currentModel.value,
-    skill_id: currentSkill.value
+    model_id: currentModel.value
   })
   conversations.value.unshift(conv)
   currentConversationId.value = conv.id
@@ -71,8 +64,6 @@ async function selectConversation(id) {
   currentConversationId.value = id
   const conv = await api.getConversation(id)
   messages.value = conv.messages || []
-  currentModel.value = conv.model_id
-  currentSkill.value = conv.skill_id
 }
 
 async function deleteConversation(id) {
@@ -84,11 +75,11 @@ async function deleteConversation(id) {
   }
 }
 
-async function handleSend(content) {
+async function handleSend({ content, skillId }) {
   if (!currentConversationId.value) {
     await createNewConversation()
   }
-  await sendMessage(content, currentConversationId.value, currentModel.value, currentSkill.value)
+  await sendMessage(content, currentConversationId.value, currentModel.value, skillId)
 }
 
 function handleStop() {
@@ -97,16 +88,6 @@ function handleStop() {
 
 async function handleModelChange(modelId) {
   currentModel.value = modelId
-  if (currentConversationId.value) {
-    await api.updateConversation(currentConversationId.value, { model_id: modelId })
-  }
-}
-
-async function handleSkillChange(skillId) {
-  currentSkill.value = skillId
-  if (currentConversationId.value) {
-    await api.updateConversation(currentConversationId.value, { skill_id: skillId })
-  }
 }
 </script>
 

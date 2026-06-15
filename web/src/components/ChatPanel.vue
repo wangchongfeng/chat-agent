@@ -9,15 +9,19 @@
         :content="msg.content"
       />
       <div v-if="messages.length === 0" class="empty-state">
-        <div class="empty-icon">💬</div>
-        <p>Start a conversation</p>
+        <div class="welcome-icon">🤖</div>
+        <h3>Welcome to Chat Agent</h3>
+        <p>Start a conversation by typing a message below</p>
+        <div class="tips">
+          <span>💡 Type <code>@</code> to select a skill</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import MessageBubble from './MessageBubble.vue'
 
 const props = defineProps({
@@ -26,7 +30,6 @@ const props = defineProps({
 })
 
 const panelRef = ref(null)
-const streamingContent = ref('')
 
 function scrollToBottom() {
   if (panelRef.value) {
@@ -34,21 +37,12 @@ function scrollToBottom() {
   }
 }
 
-function handleStreamEvent(e) {
-  streamingContent.value += e.detail.content
-  scrollToBottom()
-}
-
-onMounted(() => {
-  window.addEventListener('chat-stream', handleStreamEvent)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('chat-stream', handleStreamEvent)
-})
-
 watch(() => props.messages.length, () => {
-  scrollToBottom()
+  nextTick(scrollToBottom)
+})
+
+watch(() => props.messages[props.messages.length - 1]?.content, () => {
+  nextTick(scrollToBottom)
 })
 </script>
 
@@ -72,10 +66,41 @@ watch(() => props.messages.length, () => {
   justify-content: center;
   height: 100%;
   color: var(--color-text-secondary);
+  text-align: center;
 }
 
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+.welcome-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.tips {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--color-bg-secondary);
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.tips code {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
 }
 </style>
